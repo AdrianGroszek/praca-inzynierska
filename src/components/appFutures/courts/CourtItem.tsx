@@ -50,7 +50,7 @@ export default function CourtItem({ court }: CourtItemProps) {
 							</li>
 						</ul>
 						<div>
-							{court.isFree ? (
+							{court.is_free ? (
 								<TagSpan textColor='#cdf7f3' bgColor='rgba(205, 247, 243, 0.1)'>
 									FREE
 								</TagSpan>

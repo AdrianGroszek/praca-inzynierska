@@ -1,5 +1,12 @@
-import { createContext, type ReactNode, useContext, useReducer } from 'react';
-import { type CourtType, courts as initialCourts } from '../data/courts';
+import {
+	createContext,
+	type ReactNode,
+	useContext,
+	useEffect,
+	useReducer,
+} from 'react';
+import { courtsService } from '../services/courts';
+import { type CourtType } from '../data/courts';
 
 type StateType = {
 	courts: CourtType[];
@@ -10,8 +17,8 @@ type StateType = {
 };
 
 const initialState: StateType = {
-	courts: initialCourts,
-	filteredCourts: initialCourts,
+	courts: [],
+	filteredCourts: [],
 	searchedCourts: [],
 	filterCategory: 'All',
 	selectedCourt: null,
@@ -57,14 +64,28 @@ type SearchCourtByLocationAction = {
 	locationSlug: string;
 };
 
+type SetCourtsAction = {
+	type: 'SET_COURTS';
+	courts: CourtType[];
+};
+
 type Action =
 	| SelectCourtAction
 	| FilterCourtsCategoryAction
 	| ResetSelectedCourtAction
-	| SearchCourtByLocationAction;
+	| SearchCourtByLocationAction
+	| SetCourtsAction;
 
 function courtsReducer(state: StateType, action: Action): StateType {
 	switch (action.type) {
+		case 'SET_COURTS': {
+			return {
+				...state,
+				courts: action.courts,
+				filteredCourts: action.courts,
+				searchedCourts: action.courts,
+			};
+		}
 		case 'SELECT_COURT': {
 			const newCourt = action.court;
 			return { ...state, selectedCourt: newCourt };
@@ -108,6 +129,7 @@ function courtsReducer(state: StateType, action: Action): StateType {
 				),
 			};
 		}
+
 		default:
 			return state;
 	}
@@ -117,6 +139,18 @@ export default function CourtsContextProvider({
 	children,
 }: CourtsContextProviderProps) {
 	const [courtsState, dispatch] = useReducer(courtsReducer, initialState);
+
+	useEffect(() => {
+		async function fetchCourts() {
+			try {
+				const courts = await courtsService.getAllCourts();
+				dispatch({ type: 'SET_COURTS', courts });
+			} catch (error) {
+				console.error('Failed to fetch courts:', error);
+			}
+		}
+		fetchCourts();
+	}, []);
 
 	const ctx: CourtsContextType = {
 		courts: courtsState.courts,
