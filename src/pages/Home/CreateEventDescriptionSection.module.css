@@ -1,0 +1,65 @@
+.createVizualizationSection {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 10rem;
+}
+
+.createImgContainer {
+	display: flex;
+	align-items: center;
+	margin-right: 7rem;
+}
+
+.createInfoContainer {
+	width: 50%;
+}
+
+.createInfoContainer h3 {
+	font-size: 2.25rem;
+}
+
+.createInfoContainer .description {
+	margin: 1.5rem 0;
+}
+
+.listItem {
+	display: flex;
+	align-items: start;
+}
+
+.listItem:not(:last-child) {
+	margin-bottom: 1rem;
+}
+
+.starContainer {
+	margin-right: 1rem;
+}
+
+.listItem .star {
+	width: 25px;
+	height: 25px;
+	color: var(--color-cyan-light);
+}
+
+.listItem p span {
+	font-weight: bold;
+}
+
+@media screen and (max-width: 950px) {
+	.createImgContainer {
+		display: none;
+	}
+	.createInfoContainer {
+		width: 80%;
+	}
+}
+
+@media screen and (max-width: 600px) {
+	.createInfoContainer h3 {
+		font-size: 1.75rem;
+	}
+	.listItem .star {
+		width: 20px;
+		height: 20px;
+	}
+}

@@ -1,0 +1,148 @@
+.navbar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background-color: var(--color-black-900);
+	padding: 0.5rem 10%;
+	border-bottom: 1px solid var(--color-gray);
+	box-shadow: 12px 0px 16px rgba(0, 0, 0, 0.6);
+	z-index: 1100;
+}
+
+.opacityDiv {
+	position: fixed;
+	top: 0;
+	height: 100vh;
+	width: 100%;
+	background-color: rgba(0, 0, 0, 0.6);
+	transition: all 0.3s;
+}
+
+.logo {
+	background: -webkit-linear-gradient(
+		right,
+		var(--color-cyan-light),
+		var(--color-cyan-dark)
+	);
+	-webkit-background-clip: text;
+	font-size: 1.75rem;
+	font-weight: bold;
+	-webkit-text-fill-color: transparent;
+}
+
+.linksContainer {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.linksList {
+	display: flex;
+	margin-right: 3rem;
+}
+
+.linksList li:not(:last-child) {
+	padding-right: 1.25rem;
+}
+
+.active {
+	color: var(--color-cyan-light);
+}
+
+.linksList li a {
+	transition: 0.3s;
+}
+
+.linksList li a:hover {
+	color: var(--color-cyan-light);
+}
+
+.btnContainer a:first-child,
+.btnContainer button:first-child {
+	margin-right: 0.75rem;
+}
+
+.mobileNavigation {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	position: absolute;
+	height: calc(100vh - 59px);
+	width: 40%;
+	top: 59px;
+	right: -40%;
+	padding-bottom: 2rem;
+	background-color: var(--color-black-400);
+	transition: all 0.3s;
+}
+
+.mobileNavOpenBtnIcon {
+	transition: all 0.3s;
+}
+
+.mobileNavOpenBtn {
+	display: none;
+	padding: 0.5rem;
+	background-color: var(--color-black-900);
+	color: var(--color-white);
+}
+
+.mobileNavOpenBtnIcon {
+	height: 20px;
+	width: 20px;
+}
+
+.mobileLinksList {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	margin-top: 1rem;
+}
+
+.mobileLinksList li {
+	width: 100%;
+}
+
+.mobileLinksList li a {
+	width: 100%;
+	padding: 0.5rem;
+	border-bottom: 1px solid var(--color-black-200);
+	text-align: center;
+	transition: 0.3s;
+}
+
+.mobileBtnContainer {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	padding: 0 0.75rem;
+}
+
+.mobileActive {
+	color: var(--color-cyan-light);
+	background-color: var(--color-black-200);
+}
+
+/* MEDIA */
+@media screen and (max-width: 840px) {
+	.linksContainer {
+		display: none;
+	}
+	.mobileNavOpenBtn {
+		display: flex;
+	}
+}
+
+@media screen and (max-width: 600px) {
+	.logo {
+		font-size: 1.25rem;
+	}
+	.mobileNavigation {
+		height: calc(100vh - 53px);
+		top: 53px;
+	}
+}

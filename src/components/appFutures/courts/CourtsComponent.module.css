@@ -1,0 +1,20 @@
+.courtsContainer {
+	display: flex;
+	flex-direction: column;
+	height: calc(100vh - 220px);
+}
+
+.courtsContainer > p {
+	color: var(--color-gray);
+	font-size: 14px;
+	margin-bottom: 0.5rem;
+}
+
+.courtsListWrapper {
+	flex: 1;
+	overflow-y: scroll;
+}
+
+.courtsListWrapper::-webkit-scrollbar {
+	display: none;
+}

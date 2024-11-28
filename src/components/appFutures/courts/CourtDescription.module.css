@@ -1,0 +1,145 @@
+.sectionContainer {
+	height: 120%;
+	overflow-y: scroll;
+}
+
+.sectionContainer::-webkit-scrollbar {
+	/* display: none; */
+	width: 3px;
+}
+
+.topContentContainer {
+	display: flex;
+	padding: 1rem;
+	gap: 1rem;
+	border-bottom: 1px solid rgba(154, 165, 163, 0.2);
+}
+
+.bottomContentContainer {
+	padding: 0 1rem;
+	margin-top: 0.5rem;
+}
+
+.imgContainer {
+	width: 50%;
+	height: 200px;
+}
+
+.imgContainer img {
+	height: 100%;
+	width: 100%;
+	object-fit: cover;
+	border-radius: 8px;
+	box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
+}
+
+.topContentDescription {
+	width: 50%;
+}
+
+.courtDetailsList {
+	display: flex;
+	color: var(--color-gray);
+	margin-bottom: 0.5rem;
+}
+.courtDetailsList > li:not(:last-child) {
+	margin-right: 0.5rem;
+}
+
+.courtDetailsList li {
+	display: flex;
+	align-items: center;
+	font-size: 0.75rem;
+}
+
+.courtNameContainer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.courtDescription {
+	font-size: 14px;
+}
+
+.moreSpecyficCourtDescriptionList {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.detailsIcon {
+	margin-right: 0.25rem;
+}
+
+.activeEvents {
+	margin-left: 1rem;
+	color: var(--color-cyan-light);
+	font-size: 14px;
+}
+
+.noEventsContainer {
+	display: flex;
+	flex-direction: column;
+	justify-self: center;
+	align-items: center;
+	margin: 0 1rem;
+}
+
+.noEventsContainer > * {
+	margin-bottom: 0.5rem;
+}
+
+.noEventsContainer a {
+	margin-top: 2rem;
+	padding: 0.5rem 2rem;
+	background-color: inherit;
+	color: var(--color-cyan-light);
+	font-weight: bold;
+	border: 1px solid var(--color-cyan-light);
+	border-radius: 8px;
+	text-align: center;
+	transition: all 0.3s;
+	animation: pulse 2s infinite;
+}
+
+.noEventsContainer a:hover {
+	background-color: var(--color-cyan-light);
+	color: var(--color-black-400);
+	animation: none;
+	box-shadow: 0px 0px 8px var(--color-cyan-light);
+	transform: translateY(-2px);
+}
+
+.noEventsContainer p {
+	color: var(--color-gray);
+}
+
+.test a {
+	background-color: var(--color-black-400);
+	margin-bottom: 0.25rem;
+}
+
+.test a:hover {
+	background-color: var(--color-black-200);
+}
+
+@keyframes pulse {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.7;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+/* MEDIA */
+
+@media screen and (max-width: 1315px) {
+	.courtDetailsList {
+		flex-direction: column;
+	}
+}

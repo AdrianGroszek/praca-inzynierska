@@ -1,0 +1,40 @@
+.contactContainer {
+	text-align: center;
+}
+
+.contactContainer div:not(:last-child) {
+	margin-bottom: 2.5rem;
+}
+
+.contactContainer h3 {
+}
+
+.boldText {
+	font-weight: bold;
+	color: var(--color-white);
+}
+
+.textCyan {
+	color: var(--color-cyan-light);
+}
+
+.textShortWidth {
+	max-width: 600px;
+	margin: 0 auto;
+}
+
+.textGradient {
+	background: -webkit-linear-gradient(
+		right,
+		var(--color-cyan-light),
+		var(--color-cyan-dark)
+	);
+	-webkit-background-clip: text;
+	font-weight: bold;
+	-webkit-text-fill-color: transparent;
+}
+
+.contactHeading {
+	font-size: 2rem;
+	margin-bottom: 0.5rem;
+}

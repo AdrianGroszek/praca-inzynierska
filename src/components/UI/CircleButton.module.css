@@ -1,0 +1,20 @@
+.circleBtn {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: transparent;
+	color: var(--color-gray);
+	border-radius: 50%;
+	border: 2px solid var(--color-gray);
+	transition: all 0.2s;
+}
+
+.circleBtn:hover {
+	color: var(--color-cyan-light);
+	border-color: var(--color-cyan-light);
+}
+
+.active {
+	color: var(--color-cyan-light);
+	border-color: var(--color-cyan-light);
+}

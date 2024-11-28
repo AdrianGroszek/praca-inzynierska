@@ -1,0 +1,39 @@
+.playerItem {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.25rem 0.75rem;
+	background-color: var(--color-black-200);
+	border-radius: 6px;
+	font-size: 14px;
+	border: 1px solid var(--color-black-200);
+}
+
+.ageText {
+	color: var(--color-gray);
+}
+
+.playerItem img {
+	width: 40px;
+	height: 40px;
+	border-radius: 50px;
+}
+
+.creatorText {
+	color: var(--color-cyan-light);
+}
+
+.rightContentContainer {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}
+
+.namePlayerTextContainer {
+	display: flex;
+	justify-content: space-between;
+}
+
+.photo {
+	object-fit: cover;
+}

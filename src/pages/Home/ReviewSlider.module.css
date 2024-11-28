@@ -1,0 +1,141 @@
+.slider {
+	width: 85%;
+	max-width: 800px;
+	mask-image: linear-gradient(
+		to right,
+		transparent,
+		#000 10%,
+		#000 90%,
+		transparent
+	);
+}
+
+.slide {
+	position: relative;
+	display: flex;
+	overflow: hidden;
+}
+
+.slideItem {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	min-height: 280px;
+	min-width: 100%;
+	padding: 1.5rem 2.5rem;
+	border-top: 1px solid var(--color-cyan-dark);
+	border-bottom: 1px solid var(--color-cyan-dark);
+	transition: all 0.3s;
+}
+
+.reviewText {
+	color: var(--color-gray);
+	margin-bottom: 2rem;
+}
+
+.userInfoContainer {
+	display: flex;
+	justify-content: space-between;
+}
+
+.userInfo {
+	display: flex;
+	align-items: center;
+}
+
+.userInfoDetails {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	margin-left: 1rem;
+}
+
+.userInfoDetails .textBig {
+	font-size: 1.5rem;
+	font-weight: bold;
+}
+
+.userInfoDetails .textSmall {
+	color: var(--color-gray);
+}
+
+.starsContainer {
+	display: flex;
+	align-items: end;
+}
+
+.star {
+	width: 20px;
+	height: 20px;
+	color: var(--color-cyan-light);
+}
+
+.userImg {
+	width: 75px;
+	height: 75px;
+	border-radius: 75px;
+	object-fit: cover;
+}
+
+.btnContainer {
+	display: flex;
+	justify-content: center;
+	gap: 1.5rem;
+	padding: 1rem 0;
+}
+
+.btn {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 50px;
+	width: 50px;
+	border-radius: 50px;
+	border: 1px solid var(--color-cyan-light);
+	background-color: inherit;
+	color: var(--color-cyan-light);
+	transition: all 0.2s;
+}
+
+.btn:hover {
+	box-shadow: 0px 0px 12px var(--color-cyan-dark);
+}
+
+.btn:active {
+	scale: 0.95;
+}
+
+/* MEDIA */
+
+@media screen and (max-width: 650px) {
+	.reviewText {
+		margin-bottom: 1rem;
+	}
+	.userImg {
+		width: 50px;
+		height: 50px;
+	}
+
+	.userInfoDetails .textBig {
+		font-size: 1rem;
+	}
+
+	.userInfoDetails .textSmall {
+		font-size: 0.85rem;
+	}
+	.star {
+		width: 17px;
+		height: 17px;
+	}
+}
+
+@media screen and (max-width: 450px) {
+	.userInfoContainer {
+		flex-direction: column;
+	}
+	.starsContainer {
+		justify-content: end;
+		margin-top: 0.5rem;
+	}
+}

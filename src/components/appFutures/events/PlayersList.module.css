@@ -1,0 +1,9 @@
+.playersList {
+	max-height: 180px;
+	overflow-y: scroll;
+	padding-right: 0.5rem;
+}
+
+.playersList > *:not(:last-child) {
+	margin-bottom: 0.5rem;
+}

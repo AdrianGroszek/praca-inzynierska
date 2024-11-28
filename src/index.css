@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+@import 'leaflet/dist/leaflet.css';
+
+:root {
+	--color-black-900: #071312;
+	--color-black-800: #0f1a19;
+	--color-black-500: #2d3a39;
+	--color-black-400: #374746;
+	--color-black-300: #344644;
+	--color-black-200: #3f504e;
+	--color-white: #f7fbfa;
+	--color-gray: #9aa5a3;
+	--color-cyan-light: #03d8c3;
+	--color-cyan-dark: #018989;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: 'Montserrat', sans-serif;
+	background-color: var(--color-black-900);
+	color: var(--color-white);
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+}
+
+img {
+	display: block;
+	max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+	font: inherit;
+}
+
+button {
+	border: none;
+	cursor: pointer;
+}
+
+ul {
+	list-style: none;
+}
+
+a {
+	display: inline-block;
+	text-decoration: none;
+	color: var(--color-white);
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	overflow-wrap: break-word;
+}
+
+::-webkit-scrollbar {
+	width: 5px;
+}
+
+::-webkit-scrollbar-track {
+	background: var(--color-black-500);
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--color-cyan-light);
+	border-radius: 50px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: var(--color-cyan-dark);
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.leaflet-popup-content-wrapper {
+	background-color: var(--color-black-500);
+	color: var(--color-white);
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.leaflet-popup-content {
+	margin: 0;
+}
+
+.leaflet-popup-content h2 {
+	margin-top: 0;
+	font-size: 16px;
+	padding: 5px;
+	color: var(--color-cyan-light);
+}
+
+.leaflet-popup-content p {
+	margin: 0;
+	font-size: 14px;
+	padding: 5px; /* Dodanie paddingu do p */
+}

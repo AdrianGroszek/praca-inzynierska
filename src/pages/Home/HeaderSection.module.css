@@ -1,0 +1,158 @@
+.headerSection {
+	position: relative;
+	display: flex;
+	margin-top: 10rem;
+	margin-bottom: 15rem;
+}
+
+.smallerContainer {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 45%;
+}
+.biggerContainer {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	width: 55%;
+	height: 600px;
+	padding: 3rem;
+}
+
+.biggerContainer h2 {
+	font-size: 4rem;
+	line-height: 4rem;
+}
+
+.biggerContainer > * {
+	margin-bottom: 2rem;
+}
+
+.biggerContainer h2 span {
+	background: -webkit-linear-gradient(
+		right,
+		var(--color-cyan-light),
+		var(--color-cyan-dark)
+	);
+	-webkit-background-clip: text;
+	font-size: 4.5rem;
+	font-weight: bold;
+	-webkit-text-fill-color: transparent;
+}
+
+.biggerContainer p {
+	color: var(--color-gray);
+}
+
+.biggerContainer div {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.mouseContainer {
+	position: absolute;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	height: 100px;
+	bottom: -150px;
+	left: 50%;
+	opacity: 0.3;
+	animation: bounce 2s infinite;
+}
+
+.mouseContainer::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	width: 2px;
+	height: 50px;
+	border-radius: 5px;
+	background-color: var(--color-gray);
+}
+
+.mouseIcon {
+	margin-top: 30px;
+	font-size: 1.5rem;
+	color: var(--color-gray);
+}
+
+@keyframes bounce {
+	0%,
+	20%,
+	50%,
+	80%,
+	100% {
+		transform: translateY(0);
+	}
+	40% {
+		transform: translateY(-12px);
+	}
+	60% {
+		transform: translateY(-6px);
+	}
+}
+
+/* MEDIA */
+
+@media screen and (max-width: 1320px) {
+	.biggerContainer h2 {
+		font-size: 3rem;
+	}
+	.biggerContainer h2 span {
+		font-size: 3.5rem;
+	}
+	.biggerContainer {
+		padding: 1rem;
+	}
+}
+
+@media screen and (max-width: 940px) {
+	.smallerContainer {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 45%;
+		display: none;
+	}
+	.headerSection {
+		justify-content: center;
+	}
+	.biggerContainer {
+		width: 90%;
+		padding: 3rem 0;
+	}
+
+	.headerSection {
+		margin-bottom: 7rem;
+	}
+}
+
+@media screen and (max-width: 540px) {
+	.biggerContainer h2 {
+		font-size: 2rem;
+		line-height: 2.5rem;
+	}
+	.biggerContainer h2 span {
+		font-size: 2.5rem;
+	}
+	.biggerContainer {
+		justify-content: start;
+		padding: 2rem 0;
+	}
+	.biggerContainer p {
+		margin-bottom: 5rem;
+	}
+
+	.mouseContainer {
+		bottom: -50px;
+	}
+}
+
+@media screen and (max-width: 350px) {
+	.mouseContainer {
+		display: none;
+	}
+}
