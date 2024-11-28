@@ -1,5 +1,13 @@
-import { createContext, type ReactNode, useContext, useReducer } from 'react';
-import { type EventType, events as initialEvents } from '../data/events';
+import {
+	createContext,
+	type ReactNode,
+	useContext,
+	useEffect,
+	useReducer,
+} from 'react';
+import { eventsService } from '../services/events';
+import { type EventType } from '../data/events';
+import { supabase } from '../lib/supabase';
 
 type StateType = {
 	events: EventType[];
@@ -11,9 +19,9 @@ type StateType = {
 };
 
 const initialState: StateType = {
-	events: initialEvents,
-	filteredEvents: initialEvents,
-	searchedEvents: initialEvents,
+	events: [],
+	filteredEvents: [],
+	searchedEvents: [],
 	eventFilterCategory: 'All',
 	selectedEvent: null,
 	searchTerm: '',
@@ -39,6 +47,11 @@ export function useEvents() {
 	}
 	return context;
 }
+
+type SetEventsAction = {
+	type: 'SET_EVENTS';
+	events: EventType[];
+};
 
 type EventsContextProviderProps = {
 	children: ReactNode;
@@ -97,7 +110,8 @@ type Action =
 	| JoinTheEventAction
 	| SearchEventByLocationAction
 	| LeaveTheEventAction
-	| DeleteEventAction;
+	| DeleteEventAction
+	| SetEventsAction;
 
 function eventsReducer(state: StateType, action: Action): StateType {
 	switch (action.type) {
@@ -246,6 +260,14 @@ function eventsReducer(state: StateType, action: Action): StateType {
 				searchTerm: action.locationSlug.toLowerCase(),
 			};
 		}
+		case 'SET_EVENTS': {
+			return {
+				...state,
+				events: action.events,
+				filteredEvents: action.events,
+				searchedEvents: action.events,
+			};
+		}
 		default:
 			return state;
 	}
@@ -255,6 +277,18 @@ export default function EventsContextProvider({
 	children,
 }: EventsContextProviderProps) {
 	const [eventsState, dispatch] = useReducer(eventsReducer, initialState);
+
+	useEffect(() => {
+		async function fetchEvents() {
+			try {
+				const events = await eventsService.getAllEvents();
+				dispatch({ type: 'SET_EVENTS', events });
+			} catch (error) {
+				console.error('Failed to fetch events:', error);
+			}
+		}
+		fetchEvents();
+	}, []);
 
 	const ctx: EventsContextType = {
 		events: eventsState.events,
@@ -272,23 +306,57 @@ export default function EventsContextProvider({
 		resetSelectedEvent() {
 			dispatch({ type: 'RESET_SELECTED_EVENT' });
 		},
-		createEvent(newEvent) {
-			dispatch({ type: 'CREATE_EVENT', newEvent });
+		async createEvent(newEvent) {
+			try {
+				const {
+					data: { user },
+				} = await supabase.auth.getUser();
+				if (!user) throw new Error('User not authenticated');
+
+				const eventWithCreator = {
+					...newEvent,
+					created_by: user.id,
+					participants: [], // Inicjalizuj pustą tablicę uczestników
+				};
+
+				const createdEvent = await eventsService.createEvent(eventWithCreator);
+				dispatch({ type: 'CREATE_EVENT', newEvent: createdEvent });
+			} catch (error) {
+				console.error('Failed to create event:', error);
+			}
 		},
-		joinTheEvent(userId, eventId) {
-			dispatch({
-				type: 'JOIN_THE_EVENT',
-				payload: { userId, eventId },
-			});
+		async joinTheEvent(userId, eventId) {
+			try {
+				await eventsService.joinEvent(eventId, userId);
+				dispatch({
+					type: 'JOIN_THE_EVENT',
+					payload: { userId, eventId },
+				});
+			} catch (error) {
+				console.error('Failed to join event:', error);
+			}
 		},
 		searchEventByLocation(locationSlug) {
 			dispatch({ type: 'SEARCH_EVENT_BY_LOCATION', locationSlug });
 		},
-		leaveTheEvent(userId, eventId) {
-			dispatch({ type: 'LEAVE_THE_EVENT', payload: { userId, eventId } });
+		async leaveTheEvent(userId, eventId) {
+			try {
+				await eventsService.leaveEvent(eventId, userId);
+				dispatch({
+					type: 'LEAVE_THE_EVENT',
+					payload: { userId, eventId },
+				});
+			} catch (error) {
+				console.error('Failed to leave event:', error);
+			}
 		},
-		deleteEvent(eventId) {
-			dispatch({ type: 'DELETE_EVENT', eventId });
+		async deleteEvent(eventId) {
+			try {
+				await eventsService.deleteEvent(eventId);
+				dispatch({ type: 'DELETE_EVENT', eventId });
+			} catch (error) {
+				console.error('Failed to delete event:', error);
+			}
 		},
 	};
 
