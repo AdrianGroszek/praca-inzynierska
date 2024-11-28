@@ -1,15 +1,10 @@
 import styles from './WhyUsSection.module.css';
-import { users } from '../../data/users';
-
 import Button from '../../components/UI/Button';
-
-import { FaUsers } from 'react-icons/fa6';
-import { FaComments } from 'react-icons/fa6';
-import { FaShieldHalved } from 'react-icons/fa6';
-import { useUserLogin } from '../../context/user-login-context';
+import { FaUsers, FaComments, FaShieldHalved } from 'react-icons/fa6';
+import { useAuth } from '../../context/AuthContext';
 
 export default function WhyUsSection() {
-	const { login } = useUserLogin();
+	const { user } = useAuth();
 	return (
 		<section className={styles.wrapper}>
 			<h3>
@@ -51,11 +46,8 @@ export default function WhyUsSection() {
 					</div>
 				</li>
 			</ul>
-			<Button
-				to='/app/courts'
-				onClick={() => login(users[0])}
-				variant='primary'>
-				Get Started
+			<Button to={user ? '/app/courts' : '/login'} variant='primary'>
+				{user ? 'Get Started' : 'Login to Start'}
 			</Button>
 		</section>
 	);

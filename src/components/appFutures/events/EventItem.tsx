@@ -9,7 +9,7 @@ import { useCourts } from '../../../context/courts-context';
 import { formatEventTime } from '../../../helpers';
 import TagSpan from '../../UI/TagSpan';
 import { useEffect, useState } from 'react';
-import { useUserLogin } from '../../../context/user-login-context';
+import { useAuth } from '../../../context/AuthContext';
 import EventDescription from './EventDescription';
 
 type EventItemProp = {
@@ -20,23 +20,23 @@ export default function EventItem({ event }: EventItemProp) {
 	const { selectEvent, selectedEvent } = useEvents();
 	const { courts } = useCourts();
 	const { eventId } = useParams();
-	const { user } = useUserLogin();
+	const { user } = useAuth();
 	const location = useLocation();
 
 	const [isUserJoined, setIsUserJoined] = useState(false);
 
 	useEffect(() => {
-		if (event.participants.includes(user!.id)) {
+		if (user && event.participants.includes(user.id)) {
 			setIsUserJoined(true);
 		} else {
 			setIsUserJoined(false);
 		}
-	}, [event]);
+	}, [event, user]);
 
 	const selectedStyle: string =
 		selectedEvent && eventId === event.id ? styles.activeCourtItem : '';
 
-	const eventCourt = courts.find((court) => court.id === event.courtId);
+	const eventCourt = courts.find((court) => court.id === event.court_id);
 
 	function handleClick() {
 		selectEvent(event);
@@ -62,7 +62,7 @@ export default function EventItem({ event }: EventItemProp) {
 					<div className={styles.topContainer}>
 						<p>{event.title}</p>
 						<p className={styles.timeText}>
-							{formatEventTime(event.eventTime)}
+							{formatEventTime(event.event_time)}
 						</p>
 					</div>
 					<div className={styles.bottomContainer}>
@@ -72,7 +72,7 @@ export default function EventItem({ event }: EventItemProp) {
 									<FaUsers className={styles.detailsIcon} />
 								</p>
 								<span>
-									Prayers {event.participants.length}/{event.playerCount}
+									Prayers {event.participants.length}/{event.player_count}
 								</span>
 							</li>
 							<li>
@@ -88,7 +88,7 @@ export default function EventItem({ event }: EventItemProp) {
 									JOINED
 								</TagSpan>
 							)}
-							{event.isFree ? (
+							{event.is_free ? (
 								<TagSpan textColor='#cdf7f3' bgColor='rgba(205, 247, 243, 0.1)'>
 									FREE
 								</TagSpan>

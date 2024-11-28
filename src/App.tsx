@@ -11,6 +11,9 @@ import UserPage from './pages/UserPage';
 import { LoginForm } from './components/auth/LoginForm';
 import { RegisterForm } from './components/auth/RegisterForm';
 import ProtectedRoute from './ProtectedRoute';
+import { UserProvider } from './context/UserContext';
+import EventsContextProvider from './context/events-context';
+import CourtsContextProvider from './context/courts-context';
 
 const Router = createBrowserRouter([
 	{
@@ -72,7 +75,13 @@ const Router = createBrowserRouter([
 function App() {
 	return (
 		<AuthProvider>
-			<RouterProvider router={Router} />
+			<UserProvider>
+				<EventsContextProvider>
+					<CourtsContextProvider>
+						<RouterProvider router={Router} />
+					</CourtsContextProvider>
+				</EventsContextProvider>
+			</UserProvider>
 		</AuthProvider>
 	);
 }

@@ -1,61 +1,81 @@
-import { FaLocationDot, FaUsers } from 'react-icons/fa6';
+import {
+	FaLocationDot,
+	FaUsers,
+	FaCalendarDays,
+	FaLocationArrow,
+	FaUserCheck,
+	FaPersonRunning,
+	FaChartLine,
+} from 'react-icons/fa6';
 import styles from './EventDescription.module.css';
 import CourtTagInfo from '../courts/CourtTagInfo';
 import { useEvents } from '../../../context/events-context';
 import { formatEventTime } from '../../../helpers';
-
-import { FaCalendarDays } from 'react-icons/fa6';
-import { FaLocationArrow } from 'react-icons/fa6';
-import { FaUserCheck } from 'react-icons/fa6';
-import { FaPersonRunning } from 'react-icons/fa6';
-import { FaChartLine } from 'react-icons/fa6';
 import PlayersList from './PlayersList';
-import { useUserLogin } from '../../../context/user-login-context';
-import { EventType } from '../../../data/events';
+import { type EventType } from '../../../data/events';
 import { useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useAuth } from '../../../context/AuthContext';
+import { useUser } from '../../../context/UserContext';
 
 export default function EventDescription() {
 	const { events, joinTheEvent, leaveTheEvent, deleteEvent } = useEvents();
-	const { user, updateJoinedEvents, updateLeaveEvent, updateDeleteEvent } =
-		useUserLogin();
+	const { user } = useAuth();
+	const { profile } = useUser();
 	const { eventId } = useParams();
 
 	const selectedEvent: EventType | undefined = events.find(
 		(event) => event.id === eventId
 	);
 
-	if (!selectedEvent) return;
+	if (!selectedEvent || !user || !profile) return null;
 
-	function handleJoinTheEvent() {
-		if (!selectedEvent || !user) return;
-		if (selectedEvent.participants.length === selectedEvent.playerCount) {
-			toast.error('This event is full, please select another event.');
-			return;
+	async function handleJoinTheEvent() {
+		if (!selectedEvent || !user || !profile) return;
+		try {
+			if (selectedEvent.participants.length === selectedEvent.player_count) {
+				toast.error('This event is full, please select another event.');
+				return;
+			}
+
+			if (selectedEvent.participants.includes(user.id)) {
+				toast.error('You already joined this event.');
+				return;
+			}
+
+			if (
+				selectedEvent.min_age > (profile.age || 0) ||
+				selectedEvent.max_age < (profile.age || 0)
+			) {
+				toast.error('Your age does not fit into the range.');
+				return;
+			}
+
+			await joinTheEvent(user.id, selectedEvent.id);
+			toast.success(`You've joined. Have fun! :)`);
+		} catch (error) {
+			console.error('Error joining event:', error);
+			toast.error('Failed to join the event');
 		}
-		if (selectedEvent.participants.includes(user.id)) {
-			toast.error('You already joined to this event.');
-			return;
-		}
-		if (selectedEvent.minAge > user.age || selectedEvent.maxAge < user.age) {
-			toast.error('Your age does not fit into the range.');
-			return;
-		}
-		toast.success(`You've joined. Have fun! :)`);
-		updateJoinedEvents(selectedEvent.id);
-		joinTheEvent(user.id, selectedEvent.id);
 	}
 
-	function handleLeaveTheEvent() {
-		if (!selectedEvent || !user) return;
-		toast.success('You left the event');
-		updateLeaveEvent(selectedEvent.id);
-		if (user.createdEvents.includes(selectedEvent.id)) {
-			toast.success('Successfully deleted event');
-			deleteEvent(selectedEvent.id);
-			updateDeleteEvent(selectedEvent.id);
+	async function handleLeaveTheEvent() {
+		if (!selectedEvent || !user || !profile) return;
+		try {
+			// Sprawdź czy użytkownik jest twórcą wydarzenia
+			const isCreator = profile.created_events?.includes(selectedEvent.id);
+
+			if (isCreator) {
+				await deleteEvent(selectedEvent.id);
+				toast.success('Successfully deleted event');
+			} else {
+				await leaveTheEvent(user.id, selectedEvent.id);
+				toast.success('You left the event');
+			}
+		} catch (error) {
+			console.error('Error leaving/deleting event:', error);
+			toast.error('Failed to leave/delete the event');
 		}
-		leaveTheEvent(user.id, selectedEvent.id);
 	}
 
 	return (
@@ -73,8 +93,8 @@ export default function EventDescription() {
 							<li>
 								<FaUsers className={styles.detailsIcon} />
 								<span>
-									Prayers {selectedEvent.participants.length}/
-									{selectedEvent.playerCount}
+									Players {selectedEvent.participants.length}/
+									{selectedEvent.player_count}
 								</span>
 							</li>
 							<li>
@@ -91,7 +111,7 @@ export default function EventDescription() {
 				<div className={styles.bottomContentContainerPlayers}>
 					<p className={styles.playersCount}>
 						Players: {selectedEvent.participants.length} /{' '}
-						{selectedEvent.playerCount}
+						{selectedEvent.player_count}
 					</p>
 					<PlayersList
 						playersId={selectedEvent.participants}
@@ -104,7 +124,7 @@ export default function EventDescription() {
 							<span>
 								<FaCalendarDays />
 							</span>
-							{formatEventTime(selectedEvent.eventTime)}
+							{formatEventTime(selectedEvent.event_time)}
 						</p>
 						<p>
 							<span>
@@ -116,13 +136,13 @@ export default function EventDescription() {
 							<span>
 								<FaUserCheck />
 							</span>
-							Age: {selectedEvent.minAge} - {selectedEvent.maxAge}
+							Age: {selectedEvent.min_age} - {selectedEvent.max_age}
 						</p>
 						<p>
 							<span>
 								<FaPersonRunning />
 							</span>
-							{selectedEvent.eventType}
+							{selectedEvent.event_type}
 						</p>
 						<p>
 							<span>
@@ -132,9 +152,9 @@ export default function EventDescription() {
 						</p>
 					</div>
 
-					{selectedEvent!.participants.includes(user!.id) ? (
+					{selectedEvent.participants.includes(user.id) ? (
 						<button className={styles.leaveBtn} onClick={handleLeaveTheEvent}>
-							{user?.createdEvents.includes(selectedEvent.id)
+							{profile.created_events?.includes(selectedEvent.id)
 								? 'Leave and Delete'
 								: 'Leave'}
 						</button>

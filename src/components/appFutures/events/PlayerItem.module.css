@@ -1,4 +1,4 @@
-.playerItem {
+/* .playerItem {
 	display: flex;
 	align-items: center;
 	gap: 0.75rem;
@@ -36,4 +36,64 @@
 
 .photo {
 	object-fit: cover;
+} */
+
+.playerItem {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.75rem;
+	border-radius: 8px;
+	background-color: var(--color-grey-100);
+	margin-bottom: 0.5rem;
+}
+
+.playerInfo {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}
+
+.playerImage {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.playerDetails {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.playerName {
+	font-weight: 500;
+}
+
+.youBadge {
+	background-color: var(--color-primary-500);
+	color: white;
+	padding: 0.2rem 0.5rem;
+	border-radius: 4px;
+	font-size: 0.75rem;
+}
+
+.removeButton {
+	padding: 0.5rem 1rem;
+	border-radius: 4px;
+	border: none;
+	background-color: var(--color-red-100);
+	color: var(--color-red-700);
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.removeButton:hover:not(:disabled) {
+	background-color: var(--color-red-200);
+}
+
+.removeButton:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
 }

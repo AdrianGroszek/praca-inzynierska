@@ -13,22 +13,23 @@
 
 export type EventType = {
 	id: string;
-	createdBy: string;
+	created_by: string;
 	category: string;
 	participants: string[];
 	title: string;
 	description: string;
-	minAge: number;
-	maxAge: number;
+	min_age: number;
+	max_age: number;
 	location: string;
 	coordinates: [number, number];
-	courtId: string;
+	court_id: string;
 	photo: string;
-	playerCount: number;
-	isFree: boolean;
-	eventTime: string;
-	eventType: 'friendly' | 'tournament' | 'training';
+	player_count: number;
+	is_free: boolean;
+	event_time: string;
+	event_type: 'friendly' | 'tournament' | 'training';
 	level: 'beginner' | 'intermediate' | 'advanced';
+	created_at?: string;
 };
 
 // export const events: EventType[] = [

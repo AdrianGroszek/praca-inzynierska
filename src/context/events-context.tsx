@@ -5,9 +5,9 @@ import {
 	useEffect,
 	useReducer,
 } from 'react';
-import { eventsService } from '../services/events';
 import { type EventType } from '../data/events';
 import { supabase } from '../lib/supabase';
+import { usersService } from '../services/users';
 
 type StateType = {
 	events: EventType[];
@@ -281,8 +281,13 @@ export default function EventsContextProvider({
 	useEffect(() => {
 		async function fetchEvents() {
 			try {
-				const events = await eventsService.getAllEvents();
-				dispatch({ type: 'SET_EVENTS', events });
+				const { data, error } = await supabase
+					.from('events')
+					.select('*')
+					.order('event_time', { ascending: true });
+
+				if (error) throw error;
+				dispatch({ type: 'SET_EVENTS', events: data });
 			} catch (error) {
 				console.error('Failed to fetch events:', error);
 			}
@@ -297,65 +302,114 @@ export default function EventsContextProvider({
 		selectedEvent: eventsState.selectedEvent,
 		searchedEvents: eventsState.searchedEvents,
 		searchTerm: eventsState.searchTerm,
+
 		selectEvent(event) {
 			dispatch({ type: 'SELECT_EVENT', event });
 		},
+
 		filterEvents(eventCategory) {
 			dispatch({ type: 'FILTER_EVENTS_CATEGORY', eventCategory });
 		},
+
 		resetSelectedEvent() {
 			dispatch({ type: 'RESET_SELECTED_EVENT' });
 		},
+
 		async createEvent(newEvent) {
 			try {
-				const {
-					data: { user },
-				} = await supabase.auth.getUser();
-				if (!user) throw new Error('User not authenticated');
+				const { error } = await supabase.from('events').insert([newEvent]);
 
-				const eventWithCreator = {
-					...newEvent,
-					created_by: user.id,
-					participants: [], // Inicjalizuj pustą tablicę uczestników
-				};
+				if (error) throw error;
 
-				const createdEvent = await eventsService.createEvent(eventWithCreator);
-				dispatch({ type: 'CREATE_EVENT', newEvent: createdEvent });
+				// Aktualizuj profil użytkownika
+				await usersService.updateUserEvents(
+					newEvent.created_by,
+					newEvent.id,
+					'create'
+				);
+
+				dispatch({ type: 'CREATE_EVENT', newEvent });
 			} catch (error) {
 				console.error('Failed to create event:', error);
+				throw error;
 			}
 		},
+
 		async joinTheEvent(userId, eventId) {
 			try {
-				await eventsService.joinEvent(eventId, userId);
+				const event = eventsState.events.find((event) => event.id === eventId);
+				if (!event) throw new Error('Event not found');
+
+				const updatedEvent = {
+					...event,
+					participants: [...event.participants, userId],
+				};
+
+				const { error } = await supabase
+					.from('events')
+					.update({ participants: updatedEvent.participants })
+					.eq('id', eventId);
+
+				if (error) throw error;
+
+				await usersService.updateUserEvents(userId, eventId, 'join');
+
 				dispatch({
 					type: 'JOIN_THE_EVENT',
 					payload: { userId, eventId },
 				});
 			} catch (error) {
 				console.error('Failed to join event:', error);
+				throw error;
 			}
 		},
+
 		searchEventByLocation(locationSlug) {
 			dispatch({ type: 'SEARCH_EVENT_BY_LOCATION', locationSlug });
 		},
+
 		async leaveTheEvent(userId, eventId) {
 			try {
-				await eventsService.leaveEvent(eventId, userId);
+				const event = eventsState.events.find((event) => event.id === eventId);
+				if (!event) throw new Error('Event not found');
+
+				const updatedEvent = {
+					...event,
+					participants: event.participants.filter((id) => id !== userId),
+				};
+
+				const { error } = await supabase
+					.from('events')
+					.update({ participants: updatedEvent.participants })
+					.eq('id', eventId);
+
+				if (error) throw error;
+
+				await usersService.updateUserEvents(userId, eventId, 'leave');
+
 				dispatch({
 					type: 'LEAVE_THE_EVENT',
 					payload: { userId, eventId },
 				});
 			} catch (error) {
 				console.error('Failed to leave event:', error);
+				throw error;
 			}
 		},
+
 		async deleteEvent(eventId) {
 			try {
-				await eventsService.deleteEvent(eventId);
+				const { error } = await supabase
+					.from('events')
+					.delete()
+					.eq('id', eventId);
+
+				if (error) throw error;
+
 				dispatch({ type: 'DELETE_EVENT', eventId });
 			} catch (error) {
 				console.error('Failed to delete event:', error);
+				throw error;
 			}
 		},
 	};

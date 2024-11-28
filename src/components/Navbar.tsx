@@ -1,13 +1,15 @@
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import styles from './Navbar.module.css';
 import Button from './UI/Button';
-import { useUserLogin } from '../context/user-login-context';
 import UserProfileNav from './UserProfileNav';
 import { FaAnglesLeft } from 'react-icons/fa6';
 import { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+// import { useUser } from '../context/UserContext';
 
 export default function Navbar() {
-	const { user, login, logout } = useUserLogin();
+	const { user } = useAuth();
+	// const { profile } = useUser();
 	const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 	const location = useLocation();
 
@@ -19,13 +21,12 @@ export default function Navbar() {
 		<>
 			<div className={isMobileNavOpen ? styles.opacityDiv : ''}></div>
 			<nav className={styles.navbar}>
-				<Link to='/' onClick={logout} className={styles.logo}>
+				<Link to='/' className={styles.logo}>
 					ActivityHub
 				</Link>
 				<div className={styles.linksContainer}>
 					{!user ? (
 						<>
-							{' '}
 							<ul className={styles.linksList}>
 								<li>
 									<NavLink
@@ -57,7 +58,7 @@ export default function Navbar() {
 							</ul>
 							<div className={styles.btnContainer}>
 								<Button variant='secondary' to='/register'>
-									Sing Up
+									Sign Up
 								</Button>
 								<Button to='/login' variant='primary'>
 									Login
@@ -112,7 +113,7 @@ export default function Navbar() {
 						{!user ? (
 							<>
 								<Button variant='secondary' to='/register'>
-									Sing Up
+									Sign Up
 								</Button>
 								<Button
 									style={{ textAlign: 'center' }}

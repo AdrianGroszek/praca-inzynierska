@@ -1,23 +1,20 @@
-export type UserType = {
+export type Profile = {
 	id: string;
-	firstName: string;
-	lastName: string;
-	email: string;
-	password: string;
-	photo: string;
-	age: number;
-	createdEvents: string[];
-	joinedEvents: string[];
+	first_name: string;
+	last_name: string;
+	age: number | null;
+	photo: string | null;
+	created_events?: string[];
+	joined_events?: string[];
+	// email: string;
+	// password: string;
 };
 
-// export const user: UserType = {
-// 	id: '111',
-// 	firstName: 'Zack',
-// 	lastName: 'Efron',
-// 	email: 'testuser@test.com',
-// 	password: 'testtest123',
-// 	photo: 'https://xsgames.co/randomusers/avatar.php?g=male',
-// 	age: 28,
-// 	createdEvents: [],
-// 	joinedEvents: [],
-// };
+export type UserContextType = {
+	profile: Profile | null;
+	loading: boolean;
+	updateProfile: (updates: Partial<Profile>) => Promise<void>;
+	joinEvent: (eventId: string) => Promise<void>;
+	leaveEvent: (eventId: string) => Promise<void>;
+	addCreatedEvent: (eventId: string) => Promise<void>;
+};

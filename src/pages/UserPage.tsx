@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import Wrapper from '../components/UI/Wrapper';
 import { useEvents } from '../context/events-context';
-import { useUserLogin } from '../context/user-login-context';
+import { useAuth } from '../context/AuthContext';
+import { useUser } from '../context/UserContext';
 import styles from './UserPage.module.css';
 import { EventType } from '../data/events';
 import EventItem from '../components/appFutures/events/EventItem';
@@ -13,7 +14,8 @@ import toast from 'react-hot-toast';
 import { FaDoorOpen } from 'react-icons/fa6';
 
 export default function UserPage() {
-	const { user, updateLeaveEvent, updateDeleteEvent } = useUserLogin();
+	const { user } = useAuth();
+	const { profile } = useUser();
 	const { events, leaveTheEvent, deleteEvent, resetSelectedEvent } =
 		useEvents();
 	const navigate = useNavigate();
@@ -21,39 +23,52 @@ export default function UserPage() {
 	const [userJoinedEvents, setUserJoinedEvents] = useState<EventType[]>([]);
 	const [userCreatedEvents, setUserCreatedEvents] = useState<EventType[]>([]);
 
-	function getUserJoinedEvents() {
-		const createdEvents: string[] = user!.createdEvents;
-		const joinedEvents: string[] = user!.joinedEvents.filter(
+	useEffect(() => {
+		if (!profile) return;
+
+		const createdEvents = profile.created_events || [];
+		const joinedEvents = (profile.joined_events || []).filter(
 			(el) => !createdEvents.includes(el)
 		);
-		const createdEventsObj: EventType[] = events.filter((event) =>
+
+		const createdEventsObj = events.filter((event) =>
 			createdEvents.includes(event.id)
 		);
 
-		const joinedEventsObj: EventType[] = events.filter((event) =>
+		const joinedEventsObj = events.filter((event) =>
 			joinedEvents.includes(event.id)
 		);
 
 		setUserCreatedEvents(createdEventsObj);
 		setUserJoinedEvents(joinedEventsObj);
+	}, [profile?.created_events, profile?.joined_events, events]);
+
+	async function handleLeaveTheEvent(eventId: string) {
+		if (!user) return;
+
+		try {
+			await leaveTheEvent(user.id, eventId);
+			toast.success('You left the event');
+		} catch (error) {
+			console.error('Error leaving event:', error);
+			toast.error('Failed to leave the event');
+		}
 	}
 
-	function handleLeaveTheEvent(userId: string, eventId: string): void {
-		toast.success('You left the event');
-		updateLeaveEvent(eventId);
-		leaveTheEvent(userId, eventId);
+	async function handleDeleteTheEvent(eventId: string) {
+		if (!user) return;
+
+		try {
+			await deleteEvent(eventId);
+			await leaveTheEvent(user.id, eventId);
+			toast.success('Successfully deleted event');
+		} catch (error) {
+			console.error('Error deleting event:', error);
+			toast.error('Failed to delete the event');
+		}
 	}
 
-	function handleDeleteTheEvent(userId: string, eventId: string): void {
-		toast.success('Successfully deleted event');
-		deleteEvent(eventId);
-		updateDeleteEvent(eventId);
-		leaveTheEvent(userId, eventId);
-	}
-
-	useEffect(() => {
-		getUserJoinedEvents();
-	}, [user?.createdEvents, user?.joinedEvents]);
+	if (!user || !profile) return null;
 
 	return (
 		<Wrapper>
@@ -62,23 +77,23 @@ export default function UserPage() {
 					<FaAnglesLeft />
 					Back
 				</Link>
-				<h3>Hi, {user?.firstName}</h3>
+				<h3>Hi, {profile.first_name}</h3>
 				<div className={styles.userInfoContainer}>
 					<img
-						src={user?.photo}
+						src={profile.photo || '/default-avatar.png'}
 						alt='User profile photo'
 						className={styles.userProfilePhoto}
 					/>
 					<div>
 						<p>
-							<span className={styles.textGray}>Name:</span> {user?.firstName}{' '}
-							{user?.lastName}
+							<span className={styles.textGray}>Name:</span>{' '}
+							{profile.first_name} {profile.last_name}
 						</p>
 						<p>
-							<span className={styles.textGray}>Age:</span> {user?.age}
+							<span className={styles.textGray}>Age:</span> {profile.age}
 						</p>
 						<p>
-							<span className={styles.textGray}>Email:</span> {user?.email}
+							<span className={styles.textGray}>Email:</span> {user.email}
 						</p>
 					</div>
 				</div>
@@ -101,8 +116,7 @@ export default function UserPage() {
 								{userCreatedEvents.map((event) => (
 									<div className={styles.eventItemContainer} key={event.id}>
 										<EventItem event={event} />
-										<button
-											onClick={() => handleDeleteTheEvent(user!.id, event.id)}>
+										<button onClick={() => handleDeleteTheEvent(event.id)}>
 											<FaTrashCan className={styles.trashIcon} />
 										</button>
 									</div>
@@ -115,8 +129,7 @@ export default function UserPage() {
 								{userJoinedEvents.map((event) => (
 									<div className={styles.eventItemContainer} key={event.id}>
 										<EventItem event={event} />
-										<button
-											onClick={() => handleLeaveTheEvent(user!.id, event.id)}>
+										<button onClick={() => handleLeaveTheEvent(event.id)}>
 											<FaDoorOpen className={styles.trashIcon} />
 										</button>
 									</div>

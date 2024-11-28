@@ -2,11 +2,10 @@ import { FaAnglesDown } from 'react-icons/fa6';
 import ImageSliderHeader from '../../components/ImageSliderHeader';
 import Button from '../../components/UI/Button';
 import styles from './HeaderSection.module.css';
-import { useUserLogin } from '../../context/user-login-context';
-import { users } from '../../data/users';
+import { useAuth } from '../../context/AuthContext';
 
 export default function HeaderSection() {
-	const { login } = useUserLogin();
+	const { user } = useAuth();
 	return (
 		<section className={styles.headerSection}>
 			<div className={styles.smallerContainer}>
@@ -23,11 +22,8 @@ export default function HeaderSection() {
 					allowing you to create and join sports events effortlessly.
 				</p>
 				<div className={styles.headerBtnContainer}>
-					<Button
-						to='/app/courts'
-						onClick={() => login(users[0])}
-						variant='primary'>
-						Get Started
+					<Button to={user ? '/app/courts' : '/login'} variant='primary'>
+						{user ? 'Get Started' : 'Login to Start'}
 					</Button>
 				</div>
 			</div>

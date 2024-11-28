@@ -7,7 +7,6 @@ import DatePicker, { registerLocale } from 'react-datepicker';
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { type CourtType } from '../data/courts';
 import { v4 as uuidv4 } from 'uuid';
-import { useUserLogin } from '../context/user-login-context';
 import { EventType } from '../data/events';
 import { useEvents } from '../context/events-context';
 import { Link, useNavigate } from 'react-router-dom';
@@ -15,6 +14,9 @@ import { pl } from 'date-fns/locale';
 import { FaAnglesLeft } from 'react-icons/fa6';
 import TagSpan from '../components/UI/TagSpan';
 import { getHours, getMinutes, setHours, setMinutes } from 'date-fns';
+import { useAuth } from '../context/AuthContext';
+import { useUser } from '../context/UserContext';
+import toast from 'react-hot-toast';
 
 registerLocale('pl', pl);
 
@@ -23,9 +25,9 @@ type SelectLevelType = 'beginner' | 'intermediate' | 'advanced';
 
 export default function CreateEvent() {
 	const navigate = useNavigate();
-
 	const { courts } = useCourts();
-	const { user, updateCreatedEvents } = useUserLogin();
+	const { user } = useAuth();
+	const { profile } = useUser();
 	const { createEvent, selectEvent } = useEvents();
 
 	const [selectedCourt, setSelectedCourt] = useState<CourtType | undefined>(
@@ -56,9 +58,7 @@ export default function CreateEvent() {
 	const maxTime: Date = setHours(setMinutes(new Date(), 59), 23);
 
 	function handleCourtSelect(event: ChangeEvent<HTMLSelectElement>) {
-		const tempCourt = courts.find(
-			(court) => court.id === event.target.value || undefined
-		);
+		const tempCourt = courts.find((court) => court.id === event.target.value);
 		setSelectedCourt(tempCourt);
 	}
 
@@ -67,33 +67,39 @@ export default function CreateEvent() {
 		setSelectedDate(date);
 	}
 
-	function handleSubmit(e: FormEvent<HTMLFormElement>) {
+	async function handleSubmit(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
-		if (!user || !selectedCourt || !selectedDate) return;
-		const newEvent: EventType = {
-			id: uuidv4(),
-			createdBy: user.id,
-			category: selectedCourt.category,
-			participants: [user.id],
-			title: eventTitle,
-			description: eventDescription,
-			minAge: +minAge,
-			maxAge: +maxAge,
-			location: selectedCourt.location,
-			coordinates: selectedCourt.coordinates,
-			courtId: selectedCourt.id,
-			photo: selectedCourt.photos[0],
-			playerCount: +playersNumber,
-			isFree: selectedCourt.isFree,
-			eventTime: selectedDate.toISOString(),
-			eventType: eventType,
-			level: playersLevel,
-		};
+		if (!user || !profile || !selectedCourt || !selectedDate) return;
 
-		createEvent(newEvent);
-		updateCreatedEvents(newEvent.id);
-		selectEvent(newEvent);
-		navigate(`/app/events/${newEvent.id}`);
+		try {
+			const newEvent: Omit<EventType, 'created_at'> = {
+				id: uuidv4(),
+				created_by: user.id,
+				category: selectedCourt.category,
+				participants: [user.id],
+				title: eventTitle,
+				description: eventDescription,
+				min_age: +minAge,
+				max_age: +maxAge,
+				location: selectedCourt.location,
+				coordinates: selectedCourt.coordinates,
+				court_id: selectedCourt.id,
+				photo: selectedCourt.photos[0],
+				player_count: +playersNumber,
+				is_free: selectedCourt.is_free,
+				event_time: selectedDate.toISOString(),
+				event_type: eventType,
+				level: playersLevel,
+			};
+
+			await createEvent(newEvent);
+			selectEvent(newEvent);
+			toast.success('Event created successfully!');
+			navigate(`/app/events/${newEvent.id}`);
+		} catch (error) {
+			console.error('Error creating event:', error);
+			toast.error('Failed to create event');
+		}
 	}
 
 	return (
@@ -108,7 +114,7 @@ export default function CreateEvent() {
 					<div className={styles.topSelectedCourtView}>
 						<img src={selectedCourt.photos[0]} alt='' />
 						<div>
-							{selectedCourt.isFree ? (
+							{selectedCourt.is_free ? (
 								<TagSpan textColor='#cdf7f3' bgColor='rgba(205, 247, 243, 0.1)'>
 									FREE
 								</TagSpan>
@@ -199,7 +205,7 @@ export default function CreateEvent() {
 						type='number'
 						label='Max-age'
 						id='max-age'
-						min={user?.age}
+						min={profile?.age ?? 0}
 						max={99}
 						required
 					/>
