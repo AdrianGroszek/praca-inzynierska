@@ -15,15 +15,16 @@ import { FaDoorOpen } from 'react-icons/fa6';
 
 export default function UserPage() {
 	const { user } = useAuth();
-	const { profile } = useUser();
+	const { profile, refreshProfile } = useUser();
 	const { events, leaveTheEvent, deleteEvent, resetSelectedEvent } =
 		useEvents();
 	const navigate = useNavigate();
+	const [isLoading, setIsLoading] = useState(false);
 
 	const [userJoinedEvents, setUserJoinedEvents] = useState<EventType[]>([]);
 	const [userCreatedEvents, setUserCreatedEvents] = useState<EventType[]>([]);
 
-	useEffect(() => {
+	const updateEventLists = () => {
 		if (!profile) return;
 
 		const createdEvents = profile.created_events || [];
@@ -41,17 +42,41 @@ export default function UserPage() {
 
 		setUserCreatedEvents(createdEventsObj);
 		setUserJoinedEvents(joinedEventsObj);
-	}, [profile?.created_events, profile?.joined_events, events]);
+	};
+
+	useEffect(() => {
+		updateEventLists();
+	}, [events, profile?.created_events, profile?.joined_events]);
+
+	useEffect(() => {
+		const init = async () => {
+			setIsLoading(true);
+			try {
+				await refreshProfile();
+				updateEventLists();
+			} catch (error) {
+				console.error('Error initializing page:', error);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+		init();
+	}, []);
 
 	async function handleLeaveTheEvent(eventId: string) {
 		if (!user) return;
 
 		try {
+			setIsLoading(true);
 			await leaveTheEvent(user.id, eventId);
+			await refreshProfile();
+			updateEventLists();
 			toast.success('You left the event');
 		} catch (error) {
 			console.error('Error leaving event:', error);
 			toast.error('Failed to leave the event');
+		} finally {
+			setIsLoading(false);
 		}
 	}
 
@@ -59,15 +84,20 @@ export default function UserPage() {
 		if (!user) return;
 
 		try {
+			setIsLoading(true);
 			await deleteEvent(eventId);
-			await leaveTheEvent(user.id, eventId);
+			await refreshProfile();
+			updateEventLists();
 			toast.success('Successfully deleted event');
 		} catch (error) {
 			console.error('Error deleting event:', error);
 			toast.error('Failed to delete the event');
+		} finally {
+			setIsLoading(false);
 		}
 	}
 
+	// if (isLoading) return <div>Loading...</div>;
 	if (!user || !profile) return null;
 
 	return (

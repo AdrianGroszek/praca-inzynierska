@@ -10,6 +10,16 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 	const [profile, setProfile] = useState<Profile | null>(null);
 	const [loading, setLoading] = useState(true);
 
+	const refreshProfile = async () => {
+		if (!user) return;
+		try {
+			const userProfile = await usersService.getProfile(user.id);
+			setProfile(userProfile);
+		} catch (error) {
+			console.error('Error refreshing profile:', error);
+		}
+	};
+
 	useEffect(() => {
 		async function loadProfile() {
 			try {
@@ -84,6 +94,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 				joinEvent,
 				leaveEvent,
 				addCreatedEvent,
+				refreshProfile,
 			}}>
 			{children}
 		</UserContext.Provider>

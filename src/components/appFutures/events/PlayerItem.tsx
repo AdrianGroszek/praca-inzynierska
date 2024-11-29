@@ -1,11 +1,11 @@
-import { useState } from 'react';
+// import { useState } from 'react';
 import styles from './PlayerItem.module.css';
 import { type EventType } from '../../../data/events';
 import { type Profile } from '../../../data/user';
 import { useAuth } from '../../../context/AuthContext';
-import { useUser } from '../../../context/UserContext';
-import { eventsService } from '../../../services/events';
-import toast from 'react-hot-toast';
+// import { useUser } from '../../../context/UserContext';
+// import { eventsService } from '../../../services/events';
+// import toast from 'react-hot-toast';
 
 type PlayerItemProps = {
 	player: Profile;
@@ -14,33 +14,33 @@ type PlayerItemProps = {
 
 export default function PlayerItem({ player, selectedEvent }: PlayerItemProps) {
 	const { user } = useAuth();
-	const { profile } = useUser();
-	const [isRemoving, setIsRemoving] = useState(false);
+	// const { profile } = useUser();
+	// const [isRemoving, setIsRemoving] = useState(false);
 
-	const isCreator = selectedEvent.created_by === user?.id;
+	// const isCreator = selectedEvent.created_by === user?.id;
 	const isCurrentUser = player.id === user?.id;
 
-	const handleRemovePlayer = async () => {
-		if (!user || !profile) return;
+	// const handleRemovePlayer = async () => {
+	// 	if (!user || !profile) return;
 
-		try {
-			setIsRemoving(true);
+	// 	try {
+	// 		setIsRemoving(true);
 
-			// Usuń gracza z wydarzenia
-			await eventsService.leaveEvent(selectedEvent.id, player.id);
+	// 		// Usuń gracza z wydarzenia
+	// 		await eventsService.leaveEvent(selectedEvent.id, player.id);
 
-			toast.success(
-				isCurrentUser
-					? 'You left the event successfully!'
-					: `${player.first_name} has been removed from the event`
-			);
-		} catch (error) {
-			console.error('Error removing player:', error);
-			toast.error('Failed to remove player from event');
-		} finally {
-			setIsRemoving(false);
-		}
-	};
+	// 		toast.success(
+	// 			isCurrentUser
+	// 				? 'You left the event successfully!'
+	// 				: `${player.first_name} has been removed from the event`
+	// 		);
+	// 	} catch (error) {
+	// 		console.error('Error removing player:', error);
+	// 		toast.error('Failed to remove player from event');
+	// 	} finally {
+	// 		setIsRemoving(false);
+	// 	}
+	// };
 
 	return (
 		<li className={styles.playerItem}>
@@ -58,7 +58,7 @@ export default function PlayerItem({ player, selectedEvent }: PlayerItemProps) {
 				</div>
 			</div>
 
-			{(isCreator || isCurrentUser) && (
+			{/* {(isCreator || isCurrentUser) && (
 				<button
 					onClick={handleRemovePlayer}
 					disabled={isRemoving}
@@ -66,7 +66,7 @@ export default function PlayerItem({ player, selectedEvent }: PlayerItemProps) {
 					aria-label={isCurrentUser ? 'Leave event' : 'Remove player'}>
 					{isRemoving ? 'Removing...' : isCurrentUser ? 'Leave' : 'Remove'}
 				</button>
-			)}
+			)} */}
 		</li>
 	);
 }

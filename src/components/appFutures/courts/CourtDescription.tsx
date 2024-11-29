@@ -20,7 +20,7 @@ export default function CourtDescription() {
 	if (!selectedCourt) return;
 
 	const eventsInSelectedCourt: EventType[] = events.filter(
-		(event) => event.courtId === selectedCourt?.id
+		(event) => event.court_id === selectedCourt?.id
 	);
 
 	return (
@@ -47,7 +47,7 @@ export default function CourtDescription() {
 					</div>
 					<CourtTagInfo court={selectedCourt} />
 					<p className={styles.courtDescription}>
-						{selectedCourt.courtDescription}
+						{selectedCourt.court_description}
 					</p>
 				</div>
 			</div>

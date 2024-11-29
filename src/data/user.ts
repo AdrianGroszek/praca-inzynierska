@@ -17,4 +17,5 @@ export type UserContextType = {
 	joinEvent: (eventId: string) => Promise<void>;
 	leaveEvent: (eventId: string) => Promise<void>;
 	addCreatedEvent: (eventId: string) => Promise<void>;
+	refreshProfile: () => Promise<void>;
 };

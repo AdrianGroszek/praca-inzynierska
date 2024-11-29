@@ -36,22 +36,50 @@ export const eventsService = {
 	},
 
 	async joinEvent(eventId: string, userId: string) {
-		const { data: event } = await supabase // Popraw pobranie eventu
+		console.log('Starting joinEvent with:', { eventId, userId });
+
+		// Pobierz aktualny stan eventu
+		const { data: event, error: fetchError } = await supabase
 			.from('events')
 			.select('participants')
 			.eq('id', eventId)
 			.single();
 
+		console.log('Current event state:', event);
+		console.log('Fetch error:', fetchError);
+
+		if (fetchError) throw fetchError;
 		if (!event) throw new Error('Event not found');
 
-		const { error } = await supabase
-			.from('events')
-			.update({
-				participants: [...event.participants, userId],
-			})
-			.eq('id', eventId);
+		// Przygotuj nową tablicę uczestników
+		const updatedParticipants = Array.isArray(event.participants)
+			? [...event.participants, userId]
+			: [userId];
 
-		if (error) throw error;
+		console.log('Updated participants array:', updatedParticipants);
+
+		// Wykonaj aktualizację
+		const { data: updateResult, error: updateError } = await supabase
+			.from('events')
+			.update({ participants: updatedParticipants })
+			.eq('id', eventId)
+			.select();
+
+		console.log('Update result:', updateResult);
+		console.log('Update error:', updateError);
+
+		if (updateError) throw updateError;
+
+		// Sprawdź stan po aktualizacji
+		const { data: checkEvent } = await supabase
+			.from('events')
+			.select('participants')
+			.eq('id', eventId)
+			.single();
+
+		console.log('Event state after update:', checkEvent);
+
+		return { success: true };
 	},
 
 	async leaveEvent(eventId: string, userId: string) {
@@ -68,8 +96,31 @@ export const eventsService = {
 	},
 
 	async deleteEvent(eventId: string) {
-		const { error } = await supabase.from('events').delete().eq('id', eventId);
+		// Najpierw pobierz event, aby sprawdzić uczestników
+		const { data: event, error: fetchError } = await supabase
+			.from('events')
+			.select('participants, created_by')
+			.eq('id', eventId)
+			.single();
 
-		if (error) throw error;
+		if (fetchError) throw fetchError;
+		if (!event) throw new Error('Event not found');
+
+		// Sprawdź czy w evencie są inni uczestnicy oprócz twórcy
+		const otherParticipants = event.participants.filter(
+			(participantId: string) => participantId !== event.created_by
+		);
+
+		if (otherParticipants.length > 0) {
+			throw new Error('Cannot delete event with other participants');
+		}
+
+		// Jeśli nie ma innych uczestników, usuń event
+		const { error: deleteError } = await supabase
+			.from('events')
+			.delete()
+			.eq('id', eventId);
+
+		if (deleteError) throw deleteError;
 	},
 };

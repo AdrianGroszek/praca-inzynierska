@@ -8,6 +8,9 @@ import {
 import { type EventType } from '../data/events';
 import { supabase } from '../lib/supabase';
 import { usersService } from '../services/users';
+import { useUser } from './UserContext';
+import { eventsService } from '../services/events';
+import toast from 'react-hot-toast';
 
 type StateType = {
 	events: EventType[];
@@ -31,11 +34,11 @@ type EventsContextType = StateType & {
 	selectEvent: (event: EventType) => void;
 	filterEvents: (eventCategory: string) => void;
 	resetSelectedEvent: () => void;
-	createEvent: (newEvent: EventType) => void;
-	joinTheEvent: (userId: string, eventId: string) => void;
+	createEvent: (newEvent: EventType) => Promise<void>;
+	joinTheEvent: (userId: string, eventId: string) => Promise<void>;
 	searchEventByLocation: (locationSlug: string) => void;
-	leaveTheEvent: (userId: string, eventId: string) => void;
-	deleteEvent: (eventId: string) => void;
+	leaveTheEvent: (userId: string, eventId: string) => Promise<void>;
+	deleteEvent: (eventId: string) => Promise<void>;
 };
 
 const EventsContext = createContext<EventsContextType | null>(null);
@@ -277,6 +280,17 @@ export default function EventsContextProvider({
 	children,
 }: EventsContextProviderProps) {
 	const [eventsState, dispatch] = useReducer(eventsReducer, initialState);
+	const { refreshProfile } = useUser();
+
+	async function refreshEvents() {
+		const { data, error } = await supabase
+			.from('events')
+			.select('*')
+			.order('event_time', { ascending: true });
+
+		if (error) throw error;
+		dispatch({ type: 'SET_EVENTS', events: data || [] });
+	}
 
 	useEffect(() => {
 		async function fetchEvents() {
@@ -318,17 +332,16 @@ export default function EventsContextProvider({
 		async createEvent(newEvent) {
 			try {
 				const { error } = await supabase.from('events').insert([newEvent]);
-
 				if (error) throw error;
 
-				// Aktualizuj profil użytkownika
 				await usersService.updateUserEvents(
 					newEvent.created_by,
 					newEvent.id,
 					'create'
 				);
 
-				dispatch({ type: 'CREATE_EVENT', newEvent });
+				await refreshProfile();
+				await refreshEvents();
 			} catch (error) {
 				console.error('Failed to create event:', error);
 				throw error;
@@ -337,27 +350,15 @@ export default function EventsContextProvider({
 
 		async joinTheEvent(userId, eventId) {
 			try {
-				const event = eventsState.events.find((event) => event.id === eventId);
-				if (!event) throw new Error('Event not found');
+				// Najpierw zaktualizuj event
+				await eventsService.joinEvent(eventId, userId);
 
-				const updatedEvent = {
-					...event,
-					participants: [...event.participants, userId],
-				};
-
-				const { error } = await supabase
-					.from('events')
-					.update({ participants: updatedEvent.participants })
-					.eq('id', eventId);
-
-				if (error) throw error;
-
+				// Potem zaktualizuj profil użytkownika
 				await usersService.updateUserEvents(userId, eventId, 'join');
 
-				dispatch({
-					type: 'JOIN_THE_EVENT',
-					payload: { userId, eventId },
-				});
+				// Odśwież dane
+				await refreshProfile();
+				await refreshEvents();
 			} catch (error) {
 				console.error('Failed to join event:', error);
 				throw error;
@@ -386,11 +387,8 @@ export default function EventsContextProvider({
 				if (error) throw error;
 
 				await usersService.updateUserEvents(userId, eventId, 'leave');
-
-				dispatch({
-					type: 'LEAVE_THE_EVENT',
-					payload: { userId, eventId },
-				});
+				await refreshProfile();
+				await refreshEvents();
 			} catch (error) {
 				console.error('Failed to leave event:', error);
 				throw error;
@@ -399,16 +397,21 @@ export default function EventsContextProvider({
 
 		async deleteEvent(eventId) {
 			try {
-				const { error } = await supabase
-					.from('events')
-					.delete()
-					.eq('id', eventId);
-
-				if (error) throw error;
-
-				dispatch({ type: 'DELETE_EVENT', eventId });
+				await eventsService.deleteEvent(eventId);
+				await refreshEvents();
+				await refreshProfile();
 			} catch (error) {
-				console.error('Failed to delete event:', error);
+				if (
+					error instanceof Error &&
+					error.message === 'Cannot delete event with other participants'
+				) {
+					toast.error(
+						'Cannot delete event while other participants are still joined'
+					);
+				} else {
+					console.error('Failed to delete event:', error);
+					toast.error('Failed to delete event');
+				}
 				throw error;
 			}
 		},
