@@ -44,13 +44,25 @@ export const RegisterForm = () => {
 						first_name: formData.firstName,
 						last_name: formData.lastName,
 						age: parseInt(formData.age),
+						photo:
+							'https://www.kindpng.com/picc/m/78-786207_user-avatar-png-user-avatar-icon-png-transparent.png',
 					})
 					.eq('id', data.user.id);
 
 				if (profileError) throw profileError;
 			}
 
-			navigate('/login');
+			const { error: signInError } = await supabase.auth.signInWithPassword({
+				email: formData.email,
+				password: formData.password,
+			});
+
+			if (signInError) throw signInError;
+
+			// Przekierowanie do aplikacji
+			navigate('/app/courts');
+
+			// navigate('/login');
 		} catch (error) {
 			setError((error as Error).message);
 		} finally {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { type EventType } from '../../../data/events';
+// import { type EventType } from '../../../data/events';
 import { type Profile } from '../../../data/user';
 import PlayerItem from './PlayerItem';
 import styles from './PlayersList.module.css';
@@ -8,13 +8,10 @@ import { usersService } from '../../../services/users';
 
 type PlayersListProps = {
 	playersId: string[];
-	selectedEvent: EventType;
+	// selectedEvent: EventType;
 };
 
-export default function PlayersList({
-	playersId,
-	selectedEvent,
-}: PlayersListProps) {
+export default function PlayersList({ playersId }: PlayersListProps) {
 	const [playersData, setPlayersData] = useState<Profile[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -59,7 +56,7 @@ export default function PlayersList({
 				<PlayerItem
 					key={player.id}
 					player={player}
-					selectedEvent={selectedEvent}
+					// selectedEvent={selectedEvent}
 				/>
 			))}
 		</ul>

@@ -1,6 +1,6 @@
 // import { useState } from 'react';
 import styles from './PlayerItem.module.css';
-import { type EventType } from '../../../data/events';
+// import { type EventType } from '../../../data/events';
 import { type Profile } from '../../../data/user';
 import { useAuth } from '../../../context/AuthContext';
 // import { useUser } from '../../../context/UserContext';
@@ -9,10 +9,10 @@ import { useAuth } from '../../../context/AuthContext';
 
 type PlayerItemProps = {
 	player: Profile;
-	selectedEvent: EventType;
+	// selectedEvent: EventType;
 };
 
-export default function PlayerItem({ player, selectedEvent }: PlayerItemProps) {
+export default function PlayerItem({ player }: PlayerItemProps) {
 	const { user } = useAuth();
 	// const { profile } = useUser();
 	// const [isRemoving, setIsRemoving] = useState(false);
@@ -43,7 +43,10 @@ export default function PlayerItem({ player, selectedEvent }: PlayerItemProps) {
 	// };
 
 	return (
-		<li className={styles.playerItem}>
+		<li
+			className={`${styles.playerItem} ${
+				isCurrentUser ? styles.currentUser : styles.normalnUser
+			}`}>
 			<div className={styles.playerInfo}>
 				<img
 					src={player.photo || '/default-avatar.png'}
@@ -54,7 +57,6 @@ export default function PlayerItem({ player, selectedEvent }: PlayerItemProps) {
 					<p className={styles.playerName}>
 						{player.first_name} {player.last_name}
 					</p>
-					{isCurrentUser && <span className={styles.youBadge}>You</span>}
 				</div>
 			</div>
 

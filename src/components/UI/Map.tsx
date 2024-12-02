@@ -128,8 +128,8 @@ export default function Map() {
 									<p>{court.location}</p>
 									<p>Sport: {court.category}</p>
 									<p>Players: {court.capacity}</p>
-									<p className={court.isFree ? styles.free : styles.paid}>
-										{court.isFree ? 'Free to use' : 'Paid'}
+									<p className={court.is_free ? styles.free : styles.paid}>
+										{court.is_free ? 'Free to use' : 'Paid'}
 									</p>
 									<Link
 										to={court.id}
@@ -175,10 +175,10 @@ export default function Map() {
 									<p>{event.location}</p>
 									<p>Sport: {event.category}</p>
 									<p>
-										Players: {event.participants.length} / {event.playerCount}
+										Players: {event.participants.length} / {event.player_count}
 									</p>
-									<p className={event.isFree ? styles.free : styles.paid}>
-										{event.isFree ? 'Free to use' : 'Paid'}
+									<p className={event.is_free ? styles.free : styles.paid}>
+										{event.is_free ? 'Free to use' : 'Paid'}
 									</p>
 									<Link
 										to={event.id}
